@@ -85,7 +85,7 @@ class CarController {
      })
     @PostMapping( produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> post(@Valid @RequestBody Car car) throws URISyntaxException {
-        carService.save(car);
+        car = carService.save(car);
         Resource<Car> resource = assembler.toResource(car);
         return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
     }
@@ -98,8 +98,8 @@ class CarController {
      */
     @PutMapping(value= "/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> put(@PathVariable Long id, @Valid @RequestBody Car car) {
-         car.setId(id);
-        carService.save(car);
+        car.setId(id);
+        car = carService.save(car);
         Resource<Car> resource = assembler.toResource(car);
         return ResponseEntity.ok(resource);
     }

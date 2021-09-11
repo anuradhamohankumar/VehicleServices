@@ -65,10 +65,18 @@ public class CarService {
                     .map(carToBeUpdated -> {
                         carToBeUpdated.setDetails(oldCar.getDetails());
                         carToBeUpdated.setLocation(oldCar.getLocation());
-                        return repository.save(carToBeUpdated);
+                        carToBeUpdated.setCondition(oldCar.getCondition());
+                        carToBeUpdated.setModifiedAt(oldCar.getModifiedAt());
+                         repository.save(carToBeUpdated);
+                        carToBeUpdated.setPrice(priceClient.getPrice(oldCar.getId()));
+                        carToBeUpdated.setLocation(mapsClient.getAddress(carToBeUpdated.getLocation()));
+                        return carToBeUpdated;
+
                     }).orElseThrow(CarNotFoundException::new);
         }
-       car = repository.saveAndFlush(car);
+        car = repository.save(car);
+        car.setPrice(priceClient.getPrice(car.getId()));
+        car.setLocation(mapsClient.getAddress(car.getLocation()));
         return car;
     }
 

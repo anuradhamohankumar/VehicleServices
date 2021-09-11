@@ -4,14 +4,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.http.RequestEntity.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import com.udacity.vehicles.client.maps.MapsClient;
 import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.Condition;
@@ -81,9 +79,12 @@ public class CarControllerTest {
         mvc.perform(
                 post(new URI("/cars"))
                         .content(json.write(car).getJson())
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(status().isCreated());
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.details.mileage").value(car.getDetails().getMileage()))
+                .andExpect(jsonPath("$.details.body").value(car.getDetails().getBody()))
+                .andExpect(jsonPath("$.details.numberOfDoors").value(car.getDetails().getNumberOfDoors()));
     }
 
     /**
@@ -117,6 +118,24 @@ public class CarControllerTest {
     }
 
 
+    /**
+     * Tests for successful Updating of the car in the system
+     * @throws Exception when car Updation fails in the system
+     */
+    @Test
+    public void updateCar() throws Exception {
+        Car car = getCar();
+
+        mvc.perform(
+                put(new URI("/cars/1"))
+                       .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(json.write(car).getJson()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.details.mileage").value(car.getDetails().getMileage()))
+                .andExpect(jsonPath("$.details.externalColor").value(car.getDetails().getExternalColor()))
+                .andExpect(jsonPath("$.details.model").value(car.getDetails().getModel()));
+    }
 
 
     /**
